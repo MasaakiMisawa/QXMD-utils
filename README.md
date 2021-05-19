@@ -1,4 +1,4 @@
-# python_script_for_QXMD
+# QXMD-utils
 python scripts for QXMD code (https://magics.usc.edu/qxmd/)
 
 make_PDB.py: make PDB file for visuallization    
