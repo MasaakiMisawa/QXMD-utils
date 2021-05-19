@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib as mpl
 #mpl.use('SVG')
 import matplotlib.pyplot as plt
 
@@ -11,6 +10,8 @@ def plot_E():
 ## Computational Condition ##    
   dt = 50    # Time step in [a.u.]
   
+####################################################################################################
+# File to be read: md_eng.d
 ####################################################################################################
 
 ## Constant and Array ##  
