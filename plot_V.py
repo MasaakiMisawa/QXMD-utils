@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 def plot_V():
@@ -8,9 +7,11 @@ def plot_V():
   for n in range(ndir): dirnam[n] = './data%d' %(n+1)
 
 ## Computational Conditions ##  
-  nini = 500           # initial step number to calculate  
-  dt = 50        # MD time step in [a.u.]
+  nini = 500     # initial step number to calculate  
+  dt   = 50      # MD time step in [a.u.]
 
+####################################################################################################
+# File to be read: md_cel.d
 ####################################################################################################
 
 ## Constant and Array ##
