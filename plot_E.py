@@ -27,7 +27,7 @@ def plot_E():
     print('open: %s' %(filnam))
     while True:
       dat = fp.readline().split()   
-      if dat == []: break
+      if len(dat) == 0: break
       if dat[0] == '#': continue
       if lini == 1:
         for i in range(1, 3): base[i] = float(dat[i])
