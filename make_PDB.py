@@ -51,7 +51,7 @@ def make_PDB():
       ion = np.array([]); spc = np.array([]); ntot = 0; psti = sti
       for i in range(ncmd):
         dti = fpi[i].readline().split()
-        if dti != []:
+        if len(dti) != 0:
           if dion == 'qm': 
             sti = int(dti[0]); nty = int(dti[1]); 
             nat = np.array(dti[2:nty+2], dtype='int'); ntot = sum(nat)
@@ -66,7 +66,7 @@ def make_PDB():
           if sum(nat) == 0: fps[i].readline()
           for j in range(math.ceil(sum(nat)/36)):
             spc = np.append(spc, np.array(fps[i].readline().split(), dtype = 'int'))
-      if dti == [] or dts == []: break
+      if len(dti) == 0 or len(dts) == 0: break
       if sti > nend: break
       index = np.array(list(range(ntot)))
       if sti >= nini and (sti - nini)%nskp == 0: 
@@ -76,11 +76,11 @@ def make_PDB():
 ## Get Cell Vectors ##
       if stc < sti:
         dtc = fpc.readline().split() 
-        if dtc != []: stc = int(dtc[0])
+        if len(dtc) != 0: stc = int(dtc[0])
 
 ## Get Real Coordinate and Cell Shape and Write PDB File ##
       if sti >= nini and (sti - nini)%nskp == 0:
-        if stc <= sti and dtc != []:
+        if stc <= sti and len(dtc) != 0:
           cel = np.array(dtc[1:10], dtype='float').reshape(3,3).T
           a = np.linalg.norm(cel[:,0]); b = np.linalg.norm(cel[:,1]); c = np.linalg.norm(cel[:,2])
           al = np.arccos(np.dot(cel[:,1],cel[:,2])/(b*c))*rtd

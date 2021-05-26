@@ -28,7 +28,7 @@ def plot_V():
     print('open: %s' %(filnam))
     while True:
       dat = fp.readline().split()   
-      if dat == []: break
+      if len(dat) == 0: break
       if dat[0] == '#' or int(dat[0]) < nini: continue
       for i in range(10): dat[i] = float(dat[i])
       stp = np.append(stp, dat[0])

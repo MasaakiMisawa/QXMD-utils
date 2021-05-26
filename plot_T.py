@@ -26,7 +26,7 @@ def plot_T():
     print('open: %s' %(filnam))
     while True:
       dat = fp.readline().split()   
-      if dat == []: break
+      if len(dat) == 0: break
       if dat[0] == '#': continue
       stp = np.append(stp, float(dat[0]))
       temp = np.append(temp, float(dat[4]))
