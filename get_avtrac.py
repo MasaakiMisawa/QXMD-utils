@@ -87,8 +87,8 @@ def get_trac():
       if idn == 3:
         print('%4.2f %9.6f' %(dirlbl[cntg], np.average(t_c[idm-1, t_c.shape[1] - avl : t_c.shape[1] ])))
         fpo.write('%4.2f %9.6f\n' %(dirlbl[cntg], np.average(t_c[idm-1, t_c.shape[1] - avl : t_c.shape[1] ])))
-      outn = outn + dirgrp[cntg]
       cntg = cntg + 1
+      if cntg < len(dirgrp): outn = outn + dirgrp[cntg]
       t_a = np.array([[],[],[]]); t_b = np.array([[],[],[]]); t_c = np.array([[],[],[]])
     
 get_trac()
