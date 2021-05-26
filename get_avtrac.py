@@ -90,5 +90,7 @@ def get_trac():
       cntg = cntg + 1
       if cntg < len(dirgrp): outn = outn + dirgrp[cntg]
       t_a = np.array([[],[],[]]); t_b = np.array([[],[],[]]); t_c = np.array([[],[],[]])
+      
+  fpo.close()
     
 get_trac()
