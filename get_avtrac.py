@@ -42,7 +42,7 @@ def get_trac():
 # tractional vector is calculated based on the Cauchyi's law:
 #
 #  t = s n
-#  t: traction vector
+#  t: tractional vector
 #  s: Cauchy stress tensor (symmetric 3x3 matrix)
 #  n: normal vector parpendicular to a focused surface
 #
@@ -79,18 +79,17 @@ def get_trac():
      
     if(n == outn):
       if idn == 1:
-        print('%4.2f %9.6f' %(dirlbl[cntg], np.average(t_a[idm-1, t_a.shape[1] - avl : t_a.shape[1] ])))
-        fpo.write('%4.2f %9.6f\n' %(dirlbl[cntg], np.average(t_a[idm-1, t_a.shape[1] - avl : t_a.shape[1] ])))
+        print('%4.2f %9.6f' %(dirlbl[cntg], np.average(t_a[idm-1, max(0, t_a.shape[1] - avl) : t_a.shape[1] ])))
+        fpo.write('%4.2f %9.6f\n' %(dirlbl[cntg], np.average(t_a[idm-1, max(0, t_a.shape[1] - avl) : t_a.shape[1] ])))
       if idn == 2:
-        print('%4.2f %9.6f' %(dirlbl[cntg], np.average(t_b[idm-1, t_b.shape[1] - avl : t_b.shape[1] ])))
-        fpo.write('%4.2f %9.6f\n' %(dirlbl[cntg], np.average(t_b[idm-1, t_b.shape[1] - avl : t_b.shape[1] ])))
+        print('%4.2f %9.6f' %(dirlbl[cntg], np.average(t_b[idm-1, max(0, t_b.shape[1] - avl) : t_b.shape[1] ])))
+        fpo.write('%4.2f %9.6f\n' %(dirlbl[cntg], np.average(t_b[idm-1, max(0, t_b.shape[1] - avl) : t_b.shape[1] ])))
       if idn == 3:
-        print('%4.2f %9.6f' %(dirlbl[cntg], np.average(t_c[idm-1, t_c.shape[1] - avl : t_c.shape[1] ])))
-        fpo.write('%4.2f %9.6f\n' %(dirlbl[cntg], np.average(t_c[idm-1, t_c.shape[1] - avl : t_c.shape[1] ])))
+        print('%4.2f %9.6f' %(dirlbl[cntg], np.average(t_c[idm-1, max(0, t_c.shape[1] - avl) : t_c.shape[1] ])))
+        fpo.write('%4.2f %9.6f\n' %(dirlbl[cntg], np.average(t_c[idm-1, max(0, t_c.shape[1] - avl) : t_c.shape[1] ])))
       cntg = cntg + 1
       if cntg < len(dirgrp): outn = outn + dirgrp[cntg]
       t_a = np.array([[],[],[]]); t_b = np.array([[],[],[]]); t_c = np.array([[],[],[]])
-      
   fpo.close()
     
 get_trac()
