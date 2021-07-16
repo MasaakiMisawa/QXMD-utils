@@ -9,6 +9,7 @@ def get_avHUG():
   nini = 500           # Initial step 
   nend = 1e9           # Final step
   nave = 1500          # Average range [step]
+  cskp = 1             # Skip step in md_cel.d
   v0   = -23273.904371 # Initial volume (< 0: volume in bohr^3,  >=0: referance step)
 
 ####################################################################################################
@@ -29,9 +30,10 @@ def get_avHUG():
     fph = open('%s/md_hug.d' %(dirnam[n]), 'r')
     for i in range(4): fph.readline().split() 
     while True:
-      dtc = np.array(fpc.readline().split(), dtype='float')   
-      if len(dtc) == 0: break
       dth = np.array(fph.readline().split(), dtype='float')
+      if len(dth) == 0: break
+      if dth[0]/cskp == 0: dtc = np.array(fpc.readline().split(), dtype='float')   
+      if len(dtc) == 0: break
       if int(dth[0]) >= nini and int(dth[0]) <= nend: 
         cel = np.array(dtc[1:10]).reshape(3,3).T
         vol0 = np.dot(cel[:,0],np.cross(cel[:,1],cel[:,2])); vol = np.append(vol, vol0)
@@ -43,7 +45,7 @@ def get_avHUG():
     fpc.close()
     fph.close()
     if len(stp) - nave + 1 <= 0:
-      ptint('Error: too small nave'); return 1
+      print('Error: too small nave'); return 1
     vel *= 1.e-3  # m/s -> km/s
     avol = np.append(avol, np.average(vol[len(stp)-nave-1:len(stp)]/bvol))
     avel = np.append(avel, np.average(vel[len(stp)-nave-1:len(stp)]))
