@@ -32,7 +32,7 @@ def get_avHUG():
     while True:
       dth = np.array(fph.readline().split(), dtype='float')
       if len(dth) == 0: break
-      if dth[0]/cskp == 0: dtc = np.array(fpc.readline().split(), dtype='float')   
+      if dth[0]%cskp == 0: dtc = np.array(fpc.readline().split(), dtype='float')   
       if len(dtc) == 0: break
       if int(dth[0]) >= nini and int(dth[0]) <= nend: 
         cel = np.array(dtc[1:10]).reshape(3,3).T
