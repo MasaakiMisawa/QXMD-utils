@@ -15,8 +15,7 @@ def make_PDB():
 # Files to be read: 
 #   (1) md_log (2) md_box.d (3) md_spc.d (4) qm_ion.d (FPMD) or md_ion.d (MD)
 #                *This program also can be used for parallelized classical MD
-# Files to be created: 
-#   config.lammpstrj (including cell lengths and angles for each frame)
+# Files to be created: config.lammpstrj
 ####################################################################################################
 
 ## Constant, Array, and File Object ##
@@ -24,7 +23,7 @@ def make_PDB():
   ity = np.array([]); sti = -1; dion = 'qm'; ncmd = 1; trj = open('config.lammpstrj', 'w') 
   start = time.time()
 
-## Read Data and Open LAMMPSTRJ File ##
+## Select MD/FPMD and Open LAMMPSTRJ File ##
   for n in range(ndir):   #Directory loop
     fp = open('%s/md_log' %(dirnam[n]), 'r') 
     for i in range(6): 
@@ -32,7 +31,7 @@ def make_PDB():
       if dat[0] == 'QM' and dat[5] == '0': ncmd = int(dat[6]); dion = 'md' 
     fp.close()
 
-## Open File and Read Header ##
+## Open Data File and Read Header ##
     fpc = open('%s/md_box.d' %(dirnam[n]), 'r')
     for i in range(2): dtc = fpc.readline().split()
     fpi = np.array([]); fps = np.array([])
@@ -44,7 +43,8 @@ def make_PDB():
       fpi = np.append(fpi,open('%s/%s_ion.d%s' %(dirnam[n],dion,fn), 'r'))
       fps = np.append(fps,open('%s/md_spc.d%s' %(dirnam[n],fn), 'r'))
       dti = fpi[i].readline().split(); dts = fps[i].readline().split()
-      dts = fps[i].readline().split(); ity = np.array(dts[1:], dtype = 'int')      
+      dts = fps[i].readline().split(); ity = np.array(dts[1:], dtype = 'int') 
+     
     while True:   #Step loop
 
 ## Get MD Step, Number of Atoms, Atomic Scaled Coordinate and Species ##
@@ -73,26 +73,27 @@ def make_PDB():
         if dion == 'md': index = np.argsort(spc)
         typ = get_atom(ity)
 
-## Get Cell Vectors ##
+## Get Box Bounds ##
       if stc < sti:
         dtc = np.array(fpc.readline().split(), dtype = 'float') 
-        if len(dtc) != 0: stc = int(dtc[0])
+        if len(dtc) != 0: 
+          stc = int(dtc[0])
+          if stc <= sti and len(dtc) != 0:
+            ax = bta*dtc[1]
+            bx = bta*dtc[2]*np.cos(dtc[6]/rtd)
+            by = bta*dtc[2]*np.sin(dtc[6]/rtd)
+            cx = bta*dtc[3]*np.cos(dtc[5]/rtd)
+            cy = (bta*dtc[2]*bta*dtc[3]*np.cos(dtc[4]/rtd) - bx*cx)/by
+            cz = np.sqrt(bta*bta*dtc[3]*dtc[3] - cx*cx - cy*cy)
+            xlo = 0 + min(0.0, bx, cx, bx+cx)
+            xhi = ax + max(0.0, bx, cx, bx+cx)
+            ylo = 0 + min(0.0, cy)
+            yhi = by + max(0.0, cy)
+            zlo = 0
+            zhi = cz
 
-## Get Real Coordinate and Cell Shape and Write LAMMPSTRJ File ##
+## Write LAMMPSTRJ File ##
       if sti >= nini and (sti - nini)%nskp == 0:
-        if stc <= sti and len(dtc) != 0:
-          ax = bta*dtc[1]
-          bx = bta*dtc[2]*np.cos(dtc[6]/rtd)
-          by = bta*dtc[2]*np.sin(dtc[6]/rtd)
-          cx = bta*dtc[3]*np.cos(dtc[5]/rtd)
-          cy = (bta*dtc[2]*bta*dtc[3]*np.cos(dtc[4]/rtd) - bx*cx)/by
-          cz = np.sqrt(bta*bta*dtc[3]*dtc[3] - cx*cx - cy*cy)
-          xlo = 0 + min(0.0, bx, cx, bx+cx)
-          xhi = ax + max(0.0, bx, cx, bx+cx)
-          ylo = 0 + min(0.0, cy)
-          yhi = by + max(0.0, cy)
-          zlo = 0
-          zhi = cz
         if(sti != psti):
           nid = 0; cnt += 1
           trj.write('ITEM: TIMESTEP\n%d\n' %sti)
@@ -101,7 +102,10 @@ def make_PDB():
           trj.write('%.5f %.5f %.5f\n' %(xlo, xhi, bx))
           trj.write('%.5f %.5f %.5f\n' %(ylo, yhi, cx))
           trj.write('%.5f %.5f %.5f\n' %(zlo, zhi, cy))
-          trj.write('ITEM: ATOMS element xs ys zs\n')
+          trj.write('ITEM: ATOMS element xs ys zs')
+          #trj.write(' vx vy vz')
+          #trj.write(' q')
+          trj.write('\n')
           for j in index:
             nid += 1      
             xyz = np.array(ion[j*3: j*3 + 3])*fac
@@ -113,7 +117,7 @@ def make_PDB():
     fpc.close()
     for i in range(ncmd): fpi[i].close(); fps[i].close
     if sti > nend or fmax <= cnt: break
-  print('Total number of frames in ./config.trj: %d' %(cnt))
+  print('Total number of frames : %d' %(cnt))
   print('Elapsed time: %.2f sec' %(time.time() - start))
   trj.close()
 
