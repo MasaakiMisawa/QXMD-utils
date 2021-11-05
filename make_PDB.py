@@ -3,7 +3,7 @@ import numpy as np; import math; import time
 def make_PDB():
 ## Number of Directory and Directory Name ##
   ndir = 1;   dirnam = [[]]*ndir
-  dirnam[0] = './MSST/data2'
+  dirnam[0] = './data'
 
 ## Computational Conditions ##
   nini = 0     # Initial step number (write pdb if step >= nini)
