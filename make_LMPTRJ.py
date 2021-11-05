@@ -1,15 +1,20 @@
 import numpy as np; import math; import time
 
-def make_PDB():
+def make_TRJ():
 ## Number of Directory and Directory Name ##
   ndir = 1;   dirnam = [[]]*ndir
-  dirnam[0] = './data1'
+  dirnam[0] = './DATA/data'
 
 ## Computational Conditions ##
   nini = 0     # Initial step number (write trj if step >= nini)
   nskp = 1     # Skip step (write trj if (step - nini)%nskp == 0 )
   nend = 1e9   # Final step number (write trj if step < nend) 
   fmax = 100   # Maximum number of frames to be written
+  lout = 0     # 0: Do not output "vx, vy, vz"
+               # 1: Output atomic velocities as "vx, vy, vz"
+               # 2: Output atomic forces as "vx, vy, vz"
+               # 3: Output atomic charge as "vx"
+               # 4: Output atomic charge and polarization as "vx" and "vy", respectively
   
 ####################################################################################################
 # Files to be read: 
@@ -104,7 +109,6 @@ def make_PDB():
           trj.write('%.5f %.5f %.5f\n' %(zlo, zhi, cy))
           trj.write('ITEM: ATOMS element xs ys zs')
           #trj.write(' vx vy vz')
-          #trj.write(' q')
           trj.write('\n')
           for j in index:
             nid += 1      
@@ -127,4 +131,4 @@ def get_atom(ity):
   for i in range (len(ity)): typ = np.append(typ, pt[ity[i]])
   return typ
  
-make_PDB()
+make_TRJ()
