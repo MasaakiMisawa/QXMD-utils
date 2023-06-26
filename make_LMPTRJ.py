@@ -2,19 +2,14 @@ import numpy as np; import math; import time
 
 def make_TRJ():
 ## Number of Directory and Directory Name ##
-  ndir = 1;   dirnam = [[]]*ndir
-  dirnam[0] = './DATA/data'
+  number_of_directory = 1;   directory_name = [[]]*number_of_directory
+  directory_name[0] = '.'
+# directory_name[1] = ''
 
-## Computational Conditions ##
-  nini = 0     # Initial step number (write trj if step >= nini)
-  nskp = 1     # Skip step (write trj if (step - nini)%nskp == 0 )
-  nend = 1e9   # Final step number (write trj if step < nend) 
-  fmax = 100   # Maximum number of frames to be written
-  lout = 0     # 0: Do not output "vx, vy, vz"
-               # 1: Output atomic velocities as "vx, vy, vz"
-               # 2: Output atomic forces as "vx, vy, vz"
-               # 3: Output atomic charge as "vx"
-               # 4: Output atomic charge and polarization as "vx" and "vy", respectively
+  initial_step   = 0   
+  skip_step      = 1   
+  final_step     = 1e9
+  maximum_frames = 100
   
 ####################################################################################################
 # Files to be read: 
@@ -29,15 +24,15 @@ def make_TRJ():
   start = time.time()
 
 ## Select MD/FPMD and Open LAMMPSTRJ File ##
-  for n in range(ndir):   #Directory loop
-    fp = open('%s/md_log' %(dirnam[n]), 'r') 
+  for n in range(number_of_directory):   #Directory loop
+    fp = open('%s/md_log' %(directory_name[n]), 'r') 
     for i in range(6): 
       dat = fp.readline().split()  
       if dat[0] == 'QM' and dat[5] == '0': ncmd = int(dat[6]); dion = 'md' 
     fp.close()
 
 ## Open Data File and Read Header ##
-    fpc = open('%s/md_box.d' %(dirnam[n]), 'r')
+    fpc = open('%s/md_box.d' %(directory_name[n]), 'r')
     for i in range(2): dtc = fpc.readline().split()
     fpi = np.array([]); fps = np.array([])
     for i in range(ncmd):
@@ -45,8 +40,8 @@ def make_TRJ():
       elif ncmd < 10: fn = '%d' %(i)
       elif ncmd < 100: fn = '%02d' %(i)
       else: fn = '%03d' %(i)
-      fpi = np.append(fpi,open('%s/%s_ion.d%s' %(dirnam[n],dion,fn), 'r'))
-      fps = np.append(fps,open('%s/md_spc.d%s' %(dirnam[n],fn), 'r'))
+      fpi = np.append(fpi,open('%s/%s_ion.d%s' %(directory_name[n],dion,fn), 'r'))
+      fps = np.append(fps,open('%s/md_spc.d%s' %(directory_name[n],fn), 'r'))
       dti = fpi[i].readline().split(); dts = fps[i].readline().split()
       dts = fps[i].readline().split(); ity = np.array(dts[1:], dtype = 'int') 
      
@@ -72,9 +67,9 @@ def make_TRJ():
           for j in range(math.ceil(sum(nat)/36)):
             spc = np.append(spc, np.array(fps[i].readline().split(), dtype = 'int'))
       if len(dti) == 0 or len(dts) == 0: break
-      if sti > nend: break
+      if sti > final_step: break
       index = np.array(list(range(ntot)))
-      if sti >= nini and (sti - nini)%nskp == 0: 
+      if sti >= initial_step and (sti - initial_step)%skip_step == 0: 
         if dion == 'md': index = np.argsort(spc)
         typ = get_atom(ity)
 
@@ -98,7 +93,7 @@ def make_TRJ():
             zhi = cz
 
 ## Write LAMMPSTRJ File ##
-      if sti >= nini and (sti - nini)%nskp == 0:
+      if sti >= initial_step and (sti - initial_step)%skip_step == 0:
         if(sti != psti):
           nid = 0; cnt += 1
           trj.write('ITEM: TIMESTEP\n%d\n' %sti)
@@ -113,14 +108,16 @@ def make_TRJ():
           for j in index:
             nid += 1      
             xyz = np.array(ion[j*3: j*3 + 3])*fac
-            trj.write('%s %7.5f %7.5f %7.5f\n' %(typ[int(spc[j])-1], xyz[0], xyz[1], xyz[2]) )
+            trj.write('%s %.5f %.5f %.5f ' %(typ[int(spc[j])-1], xyz[0], xyz[1], xyz[2]) )
+            #trj.write('') 
+            trj.write('\n')
           if cnt%100 == 0 or lini == 1: print('frame %d (step %d) complete' %(cnt,sti)); lini = 0        
-          if fmax <= cnt: break
+          if maximum_frames <= cnt: break
 
 ## Close Files ##
     fpc.close()
     for i in range(ncmd): fpi[i].close(); fps[i].close
-    if sti > nend or fmax <= cnt: break
+    if sti > final_step or maximum_frames <= cnt: break
   print('Total number of frames : %d' %(cnt))
   print('Elapsed time: %.2f sec' %(time.time() - start))
   trj.close()
