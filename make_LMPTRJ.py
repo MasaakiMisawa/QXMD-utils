@@ -3,14 +3,14 @@ import numpy as np; import math; import time
 def make_TRJ():
 ## Number of Directory and Directory Name ##
   number_of_directory = 1;   directory_name = [[]]*number_of_directory
-  directory_name[0] = '/home/DATA/Ag2S/hinata/classic/Ag2Se64x32x32unitcell/3.Shear_deformation/bc-shear/data007_6'
-# directory_name[1] = ''
+  directory_name[0] = '.'
+# directory_name[1] = './data01'
 
   initial_step   = 0   
   skip_step      = 1   
   final_step     = 1e9
   maximum_frames = 100
-  IO_group_size  = 24
+  IO_group_size  = 1
   
 ####################################################################################################
 # Files to be read: 
