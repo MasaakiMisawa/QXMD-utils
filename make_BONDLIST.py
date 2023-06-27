@@ -12,33 +12,38 @@ def makebonds():
     cutoff_distances[1][2] = 2.1
     cutoff_distances[2][2] = 0.0
 
+    write_lammpstrj = 1
+
     #################################################################################################
 
     for i in range(number_of_types - 1):
         for j in range(i+1, number_of_types):
             cutoff_distances[j][i] = cutoff_distances[i][j]
 
-    fp = open('%s' %(lammpstrj_name), 'r')
-    fw = open('bonds.dat', 'w')
+    infile = open('%s' %(lammpstrj_name), 'r')
+    outfile = open('bonds.dat', 'w')
+    if write_lammpstrj: outfile2 = open('coord.lammpstrj', 'w')
     while (1):  #frame loop
         while (1):
-            dat = fp.readline().split()
+            dat = infile.readline().split()
             if len(dat) == 0:
                 sys.exit()
             elif len(dat) == 1: 
                 continue
+            elif dat[1] == 'TIMESTEP': 
+                step = int(infile.readline())
             elif dat[1] == 'NUMBER': 
-                ntot = int(fp.readline())
+                ntot = int(infile.readline())
             elif dat[1] == 'BOX':
-                dat = fp.readline().split()
+                dat = infile.readline().split()
                 xlob = float(dat[0])
                 xhib = float(dat[1])
                 xy   = float(dat[2])
-                dat = fp.readline().split()
+                dat = infile.readline().split()
                 ylob = float(dat[0])
                 yhib = float(dat[1])
                 xz   = float(dat[2])
-                dat = fp.readline().split()
+                dat = infile.readline().split()
                 zlob = float(dat[0])
                 zhib = float(dat[1])
                 yz   = float(dat[2])
@@ -57,7 +62,7 @@ def makebonds():
         typeindex = []; dic = []
         j = 0
         for i in range(ntot):
-            dat = fp.readline().split()
+            dat = infile.readline().split()
             element[i] = dat[0]
             if len(typeindex) == 0: 
                 typeindex.append(j)
@@ -84,13 +89,25 @@ def makebonds():
         #print(lengths_angles)
         #print(cel_vectors)
         neighbor_list = get_neighborlist(fractional_coords, cel_vectors, typeindex, cutoff_distances)
+        if write_lammpstrj:
+            outfile2.write('ITEM: TIMESTEP\n')
+            outfile2.write('%d\n' %step)
+            outfile2.write('ITEM: NUMBER OF ATOMS\n')
+            outfile2.write('%d\n' %ntot)
+            outfile2.write('ITEM: BOX BOUNDS xy xz yz\n')
+            outfile2.write('%.5f %.5f %.5f\n' %(xlob, xhib, xy))
+            outfile2.write('%.5f %.5f %.5f\n' %(ylob, yhib, xz))
+            outfile2.write('%.5f %.5f %.5f\n' %(zlob, zhib, yz))
+            outfile2.write('ITEM: ATOMS element xs ys zs vx\n')
         for i in range(ntot):
-            print(neighbor_list[i])
+            #print(neighbor_list[i])
+            if write_lammpstrj: outfile2.write('%s %.5f %.5f %.5f %d\n' %(element[i], fractional_coords[i][0], fractional_coords[i][1], fractional_coords[i][2], len(neighbor_list[i])))
             for j in range(len(neighbor_list[i])):
-                fw.write('%d ' %neighbor_list[i][j])
-            fw.write('\n')
-    fp.close()
-    fw.close()
+                outfile.write('%d ' %neighbor_list[i][j])
+            outfile.write('\n')
+    infile.close()
+    outfile.close()
+    if write_lammpstrj: outfile2.close()
 
 def get_celvectors(lengths_angles):
 	if len(lengths_angles) != 6:
