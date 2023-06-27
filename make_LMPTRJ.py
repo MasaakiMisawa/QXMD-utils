@@ -37,6 +37,7 @@ def make_TRJ():
     for i in range(2): dtc = fpc.readline().split()
     fpi = np.array([]); fps = np.array([])
     for i in range(int(ncmd/IO_group_size)):
+      if ncmd == 1: fn = ''
       elif ncmd < 10: fn = '%d' %(i)
       elif ncmd < 100: fn = '%02d' %(i)
       else: fn = '%03d' %(i)
@@ -124,7 +125,7 @@ def make_TRJ():
           nid = 0; cnt += 1
           trj.write('ITEM: TIMESTEP\n%d\n' %sti)
           trj.write('ITEM: NUMBER OF ATOMS\n%d\n' %ntot)
-          trj.write('ITEM: BOX BOUNDS xy xz yz xx yy zz\n')
+          trj.write('ITEM: BOX BOUNDS xy xz yz\n')
           trj.write('%.5f %.5f %.5f\n' %(xlo, xhi, bx))
           trj.write('%.5f %.5f %.5f\n' %(ylo, yhi, cx))
           trj.write('%.5f %.5f %.5f\n' %(zlo, zhi, cy))
@@ -153,5 +154,15 @@ def get_atom(ity):
   pt = ['', 'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te', 'I', 'Xe', 'Cs', 'Ba', 'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn', 'Fr', 'Ra', 'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr']
   for i in range (len(ity)): typ = np.append(typ, pt[ity[i]])
   return typ
+
+########################################################
+# scaled coordinate to real coordinate:
+# x = xs*(xhi - MAX(0, bx, cx, bx+cx) ) + ys*bx + zs*cx
+# y = ys*(yhi - MAX(0, cy) ) + zs*cy
+# z = zs*zhi
+#
+# (x, y, z): real coordinate
+# (xs, ys, zs): scaled coordinate
+########################################################
  
 make_TRJ()
