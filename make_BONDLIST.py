@@ -51,8 +51,8 @@ def makebonds():
                 break
         lengths_angles = [0, 0, 0, 0, 0, 0]
         lengths_angles[0] = xhib - max(0, xy, xz, xy+xz)
-        lengths_angles[1] = yhib - max(0, yz)
-        lengths_angles[2] = zhib
+        lengths_angles[1] = (yhib - max(0, yz))**2 + xy**2
+        lengths_angles[2] = np.sqrt(zhib*zhib + xz*xz + yz+yz)
         lengths_angles[3] = deg_rad*np.arccos((xy*xz + np.sqrt(lengths_angles[1]**2 - xy**2)*yz)/(lengths_angles[1]*lengths_angles[2]))  
         lengths_angles[4] = deg_rad*np.arccos(xz/lengths_angles[2])
         lengths_angles[5] = deg_rad*np.arccos(xy/lengths_angles[1])
